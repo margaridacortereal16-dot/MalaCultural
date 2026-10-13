@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Mala Mágica das Artes e Culturas</title>
+  
+  <!-- Google Fonts: Fredoka & Quicksand for playful preschool aesthetics -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons for intuitive buttons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tone.js for kid-friendly playful sound effects (no external audio files needed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            quicksand: ['Quicksand', 'sans-serif']
+          },
+          colors: {
+            brandYellow: '#FFDE59',
+            brandOrange: '#FF914D',
+            brandCoral: '#FF5757',
+            brandPurple: '#7B2CBF',
+            brandBlue: '#00B4D8',
+            brandGreen: '#52B788'
+          },
+          boxShadow: {
+            'kid': '0 8px 0px 0px rgba(0, 0, 0, 0.15)',
+            'kid-active': '0 2px 0px 0px rgba(0, 0, 0, 0.15)',
+            'suitcase': '0 20px 35px -10px rgba(80, 40, 20, 0.35)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    h1, h2, h3, .font-fun {
+      font-family: 'Fredoka', cursive;
+    }
+
+    /* Bouncy playful animations */
+    @keyframes gentleWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+    }
+    .wiggle-hover:hover {
+      animation: gentleWiggle 0.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      50% { transform: scale(1.1); opacity: 0.5; }
+      100% { transform: scale(0.95); opacity: 0.9; }
+    }
+    .pulse-ring {
+      animation: pulseRing 1.8s infinite ease-in-out;
+    }
+
+    /* Custom drawing canvas cursor */
+    canvas#drawingCanvas {
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-amber-50 via-sky-50 to-emerald-50 min-h-screen text-slate-800 flex flex-col overflow-x-hidden">
+
+  <header class="w-full bg-white/90 backdrop-blur-md border-b-4 border-amber-300 py-3 px-4 sm:px-8 shadow-sm flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="goToHome()">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-400 flex items-center justify-center text-white shadow-kid text-2xl wiggle-hover">
+        <i class="fa-solid fa-suitcase-rolling"></i>
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-wide text-amber-900 leading-none">
+          A Mala Mágica
+        </h1>
+        <p class="text-xs sm:text-sm text-amber-700 font-semibold">Artes e Culturas do Mundo</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Read aloud assistant volume / mute toggle -->
+      <button id="btnSoundEffects" onclick="toggleMute()" class="px-3 py-2 sm:px-4 sm:py-2 rounded-2xl bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-sm border border-sky-300">
+        <i id="soundIcon" class="fa-solid fa-volume-high text-base"></i>
+        <span class="hidden sm:inline" id="soundLabel">Som Ativo</span>
+      </button>
+
+      <!-- Guia para Educadoras Button -->
+      <button onclick="openEducatorsGuide()" class="px-3 py-2 sm:px-4 sm:py-2 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-fun font-bold text-xs sm:text-sm shadow-kid active:translate-y-1 active:shadow-kid-active transition flex items-center gap-2 border-2 border-purple-800">
+        <i class="fa-solid fa-chalkboard-user text-base"></i>
+        <span>Guia da Educadora</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="appContainer" class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative">
+    
+    <!-- VIEW 1: THE SUITCASE (Home / Exploration Screen) -->
+    <section id="viewSuitcase" class="w-full flex flex-col items-center justify-center transition-all duration-500 py-4">
+      
+      <!-- Intro Banner for Preschoolers -->
+      <div class="text-center max-w-2xl mb-6">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-amber-200 text-amber-900 font-bold text-sm sm:text-base mb-2 shadow-sm border border-amber-300 animate-bounce">
+          ✨ Toca na mala mágica para a abrir! ✨
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-amber-950">Que surpresas vieram de longe?</h2>
+        <p class="text-sm sm:text-lg text-slate-600 mt-1">Descobre artistas geniais, cores incríveis e objetos mágicos de todo o mundo.</p>
+        <div class="mt-3 flex justify-center">
+          <button id="btnPlayWelcomeVoice" onclick="playWelcomeVoiceGuide(true)" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-amber-950 font-fun font-bold text-sm shadow-kid active:translate-y-0.5 border-2 border-amber-500 flex items-center gap-2 transition hover:scale-105">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-900 animate-spin" style="animation-duration: 4s;"></i>
+            <span id="welcomeVoiceBtnText">🔊 Ouvir o que vamos fazer!</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Suitcase Container with Interactive Lid and Compartments -->
+      <div class="w-full max-w-4xl relative pt-7 sm:pt-9">
+        
+        <!-- Playful Visible Suitcase Handle on Top -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+          <div class="w-36 sm:w-52 h-9 sm:h-11 rounded-t-2xl sm:rounded-t-3xl border-4 sm:border-6 border-amber-950 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600 shadow-lg flex items-center justify-center relative">
+            <!-- Inner Grip Cutout -->
+            <div class="w-24 sm:w-36 h-3 sm:h-4 bg-gradient-to-b from-amber-950 to-amber-900 rounded-full border-2 border-yellow-200/50 shadow-inner"></div>
+            <!-- Golden Hinges Connecting Handle to Case -->
+            <div class="absolute -bottom-3 left-1.5 sm:left-2 w-5 sm:w-6 h-5 bg-gradient-to-b from-yellow-200 via-yellow-400 to-amber-600 rounded-md border-2 border-amber-950 shadow-md"></div>
+            <div class="absolute -bottom-3 right-1.5 sm:right-2 w-5 sm:w-6 h-5 bg-gradient-to-b from-yellow-200 via-yellow-400 to-amber-600 rounded-md border-2 border-amber-950 shadow-md"></div>
+          </div>
+        </div>
+
+        <!-- Closed / Open Suitcase Box -->
+        <div id="suitcaseShell" class="w-full bg-gradient-to-br from-amber-500 via-rose-500 to-indigo-600 rounded-3xl p-4 sm:p-7 shadow-suitcase border-8 border-yellow-300 relative transition-all duration-700 overflow-hidden">
+          
+          <!-- Decorative Colorful Suitcase Travel Stripes -->
+          <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-14 bg-gradient-to-r from-teal-400 via-amber-300 to-pink-400 opacity-25 pointer-events-none -rotate-1 scale-110"></div>
+
+          <!-- Suitcase Golden Metallic Corner Reinforcements -->
+          <div class="absolute top-2 left-2 w-9 h-9 rounded-tl-2xl border-t-4 border-l-4 border-yellow-200 bg-yellow-400/30 pointer-events-none"></div>
+          <div class="absolute top-2 right-2 w-9 h-9 rounded-tr-2xl border-t-4 border-r-4 border-yellow-200 bg-yellow-400/30 pointer-events-none"></div>
+          <div class="absolute bottom-2 left-2 w-9 h-9 rounded-bl-2xl border-b-4 border-l-4 border-yellow-200 bg-yellow-400/30 pointer-events-none"></div>
+          <div class="absolute bottom-2 right-2 w-9 h-9 rounded-br-2xl border-b-4 border-r-4 border-yellow-200 bg-yellow-400/30 pointer-events-none"></div>
+
+          <!-- Front Big Latch button when Closed -->
+          <div id="closedSuitcaseOverlay" class="flex flex-col items-center justify-center py-16 sm:py-24 text-center cursor-pointer group relative z-10" onclick="toggleSuitcase(true)">
+            <!-- Colorful Playful Luggage Straps -->
+            <div class="absolute inset-y-0 left-1/4 w-7 bg-amber-300/40 border-x-2 border-yellow-200/60 hidden sm:block pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-1/4 w-7 bg-amber-300/40 border-x-2 border-yellow-200/60 hidden sm:block pointer-events-none"></div>
+            
+            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-yellow-300 to-amber-400 group-hover:from-yellow-200 group-hover:to-amber-300 border-4 border-white flex items-center justify-center text-amber-900 text-4xl sm:text-5xl shadow-kid group-hover:scale-110 active:scale-95 transition-all">
+              <i class="fa-solid fa-key animate-bounce"></i>
+            </div>
+            <h3 class="text-white text-2xl sm:text-4xl font-fun font-bold mt-6 tracking-wide drop-shadow-md">
+              ✨ Clica para Abrir a Mala! ✨
+            </h3>
+            <p class="text-yellow-100 text-sm sm:text-base mt-2 font-bold drop-shadow">Dentro estão guardadas histórias, tintas e viagens misteriosas...</p>
+          </div>
+
+          <!-- Inside Suitcase Items (Revealed when open) -->
+          <div id="openSuitcaseContent" class="hidden relative z-10">
+            <!-- Suitcase Header Bar -->
+            <div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-white/30 text-white">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-300 inline-block animate-ping"></span>
+                <span class="text-sm sm:text-base font-bold font-fun tracking-wider text-yellow-100">A Mala está aberta! Escolhe um tesouro:</span>
+              </div>
+              <button onclick="toggleSuitcase(false)" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-xl border border-white/50 text-white font-bold transition shadow-sm">
+                <i class="fa-solid fa-lock mr-1"></i> Fechar mala
+              </button>
+            </div>
+
+            <!-- Categories Tabs: Artistas & Culturas -->
+            <div class="flex justify-center gap-3 mb-6">
+              <button id="tabArtistas" onclick="filterItems('artistas')" class="px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all shadow-kid border-2 bg-amber-400 text-amber-950 border-amber-300 scale-105">
+                🎨 Artistas Plásticos (5)
+              </button>
+              <button id="tabCulturas" onclick="filterItems('culturas')" class="px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all border-2 bg-indigo-900/60 text-white hover:bg-indigo-900 border-indigo-400">
+                🌍 Culturas do Mundo (4)
+              </button>
+            </div>
+
+            <!-- Grid of Interactive Treasure Objects -->
+            <div id="itemsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4 bg-white/25 backdrop-blur-md rounded-2xl border-2 border-white/40 min-h-[320px]">
+              <!-- Injected by JavaScript dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="viewDetail" class="hidden w-full max-w-6xl flex flex-col transition-all duration-300">
+      
+      <!-- Top back button & context badge -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <button onclick="goToHome()" class="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-amber-950 font-fun font-bold text-base rounded-2xl shadow-kid active:translate-y-1 active:shadow-kid-active border-2 border-amber-500 flex items-center gap-2">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Voltar à Mala</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <span id="detailCategoryBadge" class="px-3.5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider text-white shadow-sm">
+            Categoria
+          </span>
+          <span id="detailFocusBadge" class="hidden sm:inline-block px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-800 font-semibold text-xs border border-amber-300">
+            Foco Sensorial
+          </span>
+        </div>
+      </div>
+
+      <!-- Main Activity Split: Left Question & Voice Card | Right Drawing Atelier -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT COLUMN: Object representation & Question Cards (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-5">
+          
+          <!-- Card of the Object & Prompt -->
+          <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-md border-4 border-amber-200 relative overflow-hidden">
+            <!-- Decorative corner circle -->
+            <div id="themeGlow" class="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 pointer-events-none"></div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <div id="detailObjectIconWrap" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-inner border-2 border-slate-100">
+                <!-- Icon injected -->
+              </div>
+              <div class="flex-1">
+                <span id="detailObjectName" class="text-xs font-bold uppercase tracking-wider text-slate-400">Objeto</span>
+                <h3 id="detailTitle" class="text-xl sm:text-2xl font-bold font-fun text-slate-800 leading-tight">Título</h3>
+                <p id="detailSubtitle" class="text-xs sm:text-sm font-semibold text-amber-600">Subtítulo</p>
+              </div>
+            </div>
+
+            <!-- Artwork / Cultural Visual Context Banner (SVG Stylized or Prompt Description) -->
+            <div id="artworkVisualPreview" class="w-full h-36 sm:h-44 rounded-2xl mb-4 p-3 relative flex items-center justify-center text-center overflow-hidden border-2 border-slate-100">
+              <!-- Visual graphic injected -->
+            </div>
+
+            <!-- Breve Introdução Lúdica para Crianças (Especialmente Culturas) -->
+            <div id="detailIntroBox" class="mb-4 bg-amber-100/80 rounded-2xl p-3 sm:p-3.5 border-2 border-amber-300 text-xs sm:text-sm text-amber-950 flex items-start gap-2.5 shadow-xs">
+              <div class="w-8 h-8 rounded-xl bg-amber-300/80 flex items-center justify-center text-amber-800 flex-shrink-0 text-sm mt-0.5">
+                <i id="detailIntroIcon" class="fa-solid fa-earth-americas"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between gap-1 mb-0.5">
+                  <span id="detailIntroTitle" class="font-bold font-fun text-amber-900 text-xs sm:text-sm">Quem são e de onde vêm?</span>
+                  <button id="btnReadIntro" onclick="readIntroAloud()" class="p-1 sm:px-2 sm:py-0.5 rounded-lg bg-amber-300/70 hover:bg-amber-300 text-amber-900 text-[11px] font-bold flex items-center gap-1 active:scale-95 transition" title="Ouvir explicação">
+                    <i class="fa-solid fa-volume-high text-[10px]"></i>
+                    <span class="hidden sm:inline">Ouvir</span>
+                  </button>
+                </div>
+                <p id="detailIntroText" class="text-xs sm:text-[13px] text-amber-950 leading-relaxed font-medium">...</p>
+              </div>
+            </div>
+
+            <!-- Question Box with Audio Playback -->
+            <div class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-200">
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div class="flex items-center gap-2 text-amber-800 font-fun font-bold text-sm">
+                  <i class="fa-solid fa-comments text-amber-500 text-base"></i>
+                  <span>Pergunta para Pensar & Sentir:</span>
+                </div>
+                <!-- Read question aloud button -->
+                <button id="btnReadAloud" onclick="readActiveQuestionAloud()" class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Ouvir a pergunta">
+                  <i class="fa-solid fa-volume-high"></i>
+                  <span class="hidden sm:inline">Ouvir</span>
+                </button>
+              </div>
+
+              <!-- Question text -->
+              <p id="activeQuestionText" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed min-h-[64px] flex items-center">
+                ...
+              </p>
+
+              <!-- Next / Previous Question Selector (Little carousel dots/arrows) -->
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-amber-200/80">
+                <button onclick="changeQuestion(-1)" class="w-8 h-8 rounded-xl bg-white border border-amber-300 text-amber-800 flex items-center justify-center hover:bg-amber-100 active:scale-95">
+                  <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <div id="questionIndicators" class="flex items-center gap-1.5">
+                  <!-- Dots -->
+                </div>
+                <button onclick="changeQuestion(1)" class="w-8 h-8 rounded-xl bg-white border border-amber-300 text-amber-800 flex items-center justify-center hover:bg-amber-100 active:scale-95">
+                  <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- VOICE RECORDER BOX (Kids can speak their thoughts) -->
+          <div class="bg-white rounded-3xl p-5 shadow-md border-4 border-rose-200 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-rose-700 font-fun font-bold text-base">
+                <div class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
+                  <i class="fa-solid fa-microphone"></i>
+                </div>
+                <span>Gravar a Minha Resposta</span>
+              </div>
+              <span id="recordingTimer" class="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 hidden">
+                00:00
+              </span>
+            </div>
+
+            <!-- Big Kid Recording Buttons -->
+            <div class="flex items-center justify-center gap-4 py-2">
+              <button id="btnRecordToggle" onclick="toggleVoiceRecording()" class="px-6 py-3.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-fun font-bold text-base sm:text-lg shadow-kid active:translate-y-1 active:shadow-kid-active flex items-center gap-3 transition">
+                <i id="recordBtnIcon" class="fa-solid fa-circle text-sm animate-pulse"></i>
+                <span id="recordBtnText">Gravar Voz</span>
+              </button>
+
+              <button id="btnPlayRecording" onclick="playCurrentRecording()" disabled class="px-5 py-3.5 rounded-2xl bg-slate-200 text-slate-400 font-fun font-bold text-base flex items-center gap-2 cursor-not-allowed transition">
+                <i id="playBtnIcon" class="fa-solid fa-play"></i>
+                <span>Ouvir</span>
+              </button>
+            </div>
+
+            <!-- Audio Player Widget when audio recorded -->
+            <div id="recordingFeedback" class="text-center text-xs text-slate-500 min-h-[20px]">
+              Toca no botão vermelho e diz o que pensas em voz alta!
+            </div>
+            <audio id="audioPlayback" class="hidden"></audio>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: THE CREATIVE ATELIER / DRAWING CANVAS (7 Cols) -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-4 sm:p-6 shadow-md border-4 border-sky-200 flex flex-col gap-4">
+          
+          <!-- Atelier Header with Tools -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-slate-100">
+            <div class="flex items-center gap-2">
+              <div class="w-10 h-10 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 text-xl font-bold">
+                <i class="fa-solid fa-palette"></i>
+              </div>
+              <div>
+                <h3 class="text-lg sm:text-xl font-fun font-bold text-slate-800 leading-tight">Atelier de Criação</h3>
+                <p id="atelierSuggestion" class="text-xs text-sky-600 font-semibold">Usa tintas, recortes e pontilhismo!</p>
+              </div>
+            </div>
+
+            <!-- Canvas Quick Actions (Clear & Download) -->
+            <div class="flex items-center gap-2">
+              <button onclick="undoCanvas()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition" title="Desfazer">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Desfazer
+              </button>
+              <button onclick="clearCanvasModal()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition" title="Limpar tudo">
+                <i class="fa-solid fa-trash-can mr-1"></i> Limpar
+              </button>
+              <button onclick="downloadArtwork()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-fun font-bold shadow-sm transition" title="Guardar desenho">
+                <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar
+              </button>
+            </div>
+          </div>
+
+          <!-- Tool Selector Buttons (Themed for preschool materials) -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <span class="font-bold text-slate-400 text-[11px] uppercase tracking-wider">Material:</span>
+            
+            <button onclick="setTool('brush')" id="tool-brush" class="tool-btn px-3 py-1.5 rounded-xl bg-amber-400 text-amber-950 font-bold flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-paintbrush"></i> Pincel Grosso
+            </button>
+            <button onclick="setTool('dots')" id="tool-dots" class="tool-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center gap-1.5 hover:bg-slate-200">
+              <i class="fa-solid fa-braille"></i> Pontilhismo
+            </button>
+            <button onclick="setTool('stamps')" id="tool-stamps" class="tool-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center gap-1.5 hover:bg-slate-200">
+              <i class="fa-solid fa-shapes"></i> Carimbos / Recortes
+            </button>
+            <button onclick="setTool('eraser')" id="tool-eraser" class="tool-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center gap-1.5 hover:bg-slate-200">
+              <i class="fa-solid fa-eraser"></i> Borracha
+            </button>
+          </div>
+
+          <!-- Material Secondary Controls (Stamps or Size) -->
+          <div id="stampsPalette" class="hidden flex items-center gap-2 bg-amber-50 p-2.5 rounded-2xl border border-amber-200 overflow-x-auto">
+            <span class="text-xs font-bold text-amber-900 whitespace-nowrap">Escolhe o carimbo:</span>
+            <div id="stampsContainer" class="flex items-center gap-2">
+              <!-- Dynamically populated or standard emojis / cultural stamps -->
+            </div>
+          </div>
+
+          <!-- Colors and Stroke Sizes Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <!-- Color swatches -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold text-slate-500 mr-1">Cor:</span>
+              <div id="colorSwatches" class="flex items-center gap-1.5 flex-wrap">
+                <!-- Color dots -->
+              </div>
+            </div>
+
+            <!-- Stroke Size Slider -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500">Grossura:</span>
+              <input type="range" id="brushSize" min="4" max="48" value="16" oninput="updateBrushSize(this.value)" class="w-24 accent-amber-500 cursor-pointer">
+              <span id="brushSizeIndicator" class="w-6 h-6 rounded-full bg-slate-800 inline-block align-middle flex-shrink-0"></span>
+            </div>
+          </div>
+
+          <!-- The Drawing Canvas Container -->
+          <div class="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-white rounded-2xl border-4 border-dashed border-slate-300 overflow-hidden shadow-inner group">
+            <canvas id="drawingCanvas" class="w-full h-full block bg-white"></canvas>
+
+            <!-- Watermark / helper prompt on empty canvas -->
+            <div id="canvasEmptyHelp" class="absolute inset-0 flex flex-col items-center justify-center text-slate-300 pointer-events-none p-4 text-center">
+              <i class="fa-solid fa-wand-magic-sparkles text-4xl mb-2"></i>
+              <p class="font-fun text-lg text-slate-400">Desenha aqui livremente a tua resposta mágica!</p>
+              <p class="text-xs text-slate-300">Podes usar o dedo ou o rato</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="modalEducatorsGuide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-end transition-opacity">
+    <div class="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-slide-left">
+      
+      <!-- Guide Header -->
+      <div class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white p-5 sm:p-6 flex items-center justify-between border-b-4 border-purple-900">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold font-fun">Guia Pedagógico da Educadora</h2>
+            <p class="text-xs sm:text-sm text-purple-200">Orientações para o Pré-Escolar (3 aos 6 anos)</p>
+          </div>
+        </div>
+        <button onclick="closeEducatorsGuide()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xl transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Guide Content (Scrollable) -->
+      <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-slate-700 text-sm leading-relaxed">
+        
+        <!-- Framing with OCEPE -->
+        <div class="bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
+          <h3 class="font-fun font-bold text-purple-900 text-base mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-compass text-purple-600"></i>
+            Enquadramento Curricular (OCEPE)
+          </h3>
+          <p class="text-xs sm:text-sm text-purple-950">
+            Este recurso articula a <strong>Área de Expressão e Comunicação</strong> (Domínio da Educação Artística: Artes Visuais) com a <strong>Área do Conhecimento do Mundo</strong> (Diversidade Cultural e Social) e a <strong>Linguagem Oral e Abordagem à Escrita</strong>. 
+          </p>
+          <ul class="list-disc list-inside mt-2 text-xs space-y-1 text-purple-900">
+            <li>Privilegia a escuta ativa da criança e a atribuição pessoal de significado.</li>
+            <li>Encoraja a multimodalidade: falar, expressar com o corpo e registar graficamente.</li>
+            <li>Promove a curiosidade estética e o respeito pela diversidade cultural global.</li>
+          </ul>
+        </div>
+
+        <!-- Strategy for Using "A Mala Mágica" in the classroom -->
+        <div>
+          <h3 class="font-fun font-bold text-slate-800 text-lg mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-sparkles text-amber-500"></i>
+            Como Dinamizar a Atividade em Pequeno ou Grande Grupo
+          </h3>
+          <ol class="space-y-3 list-decimal list-inside text-xs sm:text-sm text-slate-600">
+            <li class="pl-1">
+              <strong class="text-slate-800">O Momento do Mistério:</strong> Reúna as crianças na manta ou roda de conversa. Abra o aplicativo na tela interativa ou tablet e peça a uma criança para abrir a fechadura da mala mágica.
+            </li>
+            <li class="pl-1">
+              <strong class="text-slate-800">Escolha de um Tesouro:</strong> Deixe o grupo votar ou escolher um objeto (ex.: <em>O Pincel das Noites Rodopiantes</em> ou <em>A Máscara de Madeira</em>).
+            </li>
+            <li class="pl-1">
+              <strong class="text-slate-800">Escuta & "Ver com o Corpo":</strong> Use a voz do aplicativo ou leia a questão. Antes de desenhar, convide as crianças a corporizarem a sensação (ex.: imitar o vento nas estrelas ou fazer uma pose congelada como a máscara).
+            </li>
+            <li class="pl-1">
+              <strong class="text-slate-800">Registo de Voz:</strong> Pressione o microfone para gravar as respostas espontâneas das crianças. É um recurso valioso para a <em>documentação pedagógica</em> e avaliação formativa.
+            </li>
+            <li class="pl-1">
+              <strong class="text-slate-800">Atelier Gráfico:</strong> As crianças exploram as ferramentas temáticas do atelier digital (ou em paralelo na mesa com tintas, recortes e papéis reais). Guarde o ficheiro no final para o portefólio individual da criança!
+            </li>
+          </ol>
+        </div>
+
+        <!-- Detailed Guide for Each Item -->
+        <div>
+          <h3 class="font-fun font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-emerald-600"></i>
+            Guião Específico de Mediação por Objeto
+          </h3>
+
+          <div class="space-y-3" id="guideAccordionItems">
+            <!-- Rendered by JS with rich suggestions for teachers -->
+          </div>
+        </div>
+
+        <!-- Material suggestions for real-life atelier extensions -->
+        <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+          <h4 class="font-bold font-fun text-amber-900 mb-1 flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-box-open text-amber-600"></i>
+            Dica de Extensão para a Mesa Real:
+          </h4>
+          <p class="text-xs text-amber-900 leading-relaxed">
+            Tenha perto uma mala física real com pequenos elementos táteis: esponjas de texturas diferentes, fita-cola preta e cartolina colorida, cotonetes e tintas acrílicas, recortes de papel de seda, e folhas naturais secas. A transição entre o ecrã e o toque sensorial enriquece a aprendizagem no pré-escolar!
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Guide Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeEducatorsGuide()" class="px-5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-fun font-bold text-sm rounded-xl transition shadow-sm">
+          Compreendido / Voltar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="clearCanvasModalBox" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border-4 border-amber-300 transform scale-95 transition-transform">
+      <div class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center mx-auto text-3xl mb-3">
+        <i class="fa-solid fa-wand-magic"></i>
+      </div>
+      <h3 class="text-xl font-bold font-fun text-slate-800 mb-1">Limpar a folha?</h3>
+      <p class="text-xs text-slate-600 mb-5">Queres apagar tudo para começar um desenho novinho em folha?</p>
+      <div class="flex items-center justify-center gap-3">
+        <button onclick="closeClearModal()" class="px-4 py-2.5 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-300">
+          Não, continuar
+        </button>
+        <button onclick="confirmClearCanvas()" class="px-5 py-2.5 rounded-xl bg-rose-500 text-white font-fun font-bold text-sm hover:bg-rose-600 shadow-sm">
+          Sim, apagar!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box (Kid friendly) -->
+  <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-2xl z-50 hidden flex items-center gap-2 pointer-events-none transition-all">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMessage">Desenho guardado com sucesso!</span>
+  </div>
+
+  <script>
+    // Sound FX engine using Tone.js synthesizers
+    let soundEnabled = true;
+    let synth = null;
+    let clickSynth = null;
+
+    function initAudio() {
+      if (!synth && typeof Tone !== 'undefined') {
+        try {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 0.8 }
+          }).toDestination();
+          synth.volume.value = -8;
+
+          clickSynth = new Tone.MembraneSynth().toDestination();
+          clickSynth.volume.value = -12;
+        } catch(e) {
+          console.warn("Tone.js could not start automatically:", e);
+        }
+      }
+    }
+
+    function playNote(note = "C5", duration = "8n") {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        if (Tone.context.state !== 'running') {
+          Tone.start();
+        }
+        if (synth) synth.triggerAttackRelease(note, duration);
+      } catch (e) {}
+    }
+
+    function playCheerChime() {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        if (Tone.context.state !== 'running') Tone.start();
+        const now = Tone.now();
+        if (synth) {
+          synth.triggerAttackRelease("C5", "16n", now);
+          synth.triggerAttackRelease("E5", "16n", now + 0.1);
+          synth.triggerAttackRelease("G5", "16n", now + 0.2);
+          synth.triggerAttackRelease("C6", "8n", now + 0.3);
+        }
+      } catch(e) {}
+    }
+
+    function toggleMute() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('soundIcon');
+      const label = document.getElementById('soundLabel');
+      if (soundEnabled) {
+        icon.className = "fa-solid fa-volume-high text-base text-sky-700";
+        label.innerText = "Som Ativo";
+        playNote("G5");
+      } else {
+        icon.className = "fa-solid fa-volume-xmark text-base text-slate-400";
+        label.innerText = "Sem Som";
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      }
+    }
+
+    /* DATA REPOSITORY: 5 Artists and 4 Cultures with enriched questions, items and guide notes */
+    const suitcaseTreasures = [
+      // 1. Vincent van Gogh
+      {
+        id: "van-gogh",
+        category: "artistas",
+        name: "Pincel Rodopiante de Noite",
+        artistOrCulture: "Vincent van Gogh",
+        focus: "Cores Vibrantes & Emoções",
+        intro: "Vincent van Gogh era um pintor que adorava pintar o céu, o vento e os girassóis com pinceladas cheias de curvas e muita emoção.",
+        icon: "fa-solid fa-paintbrush",
+        bgGradient: "from-blue-600 via-indigo-700 to-amber-500",
+        colorTheme: "#0284c7",
+        image: "data:image/jpeg;base64,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",
+        visualHint: "🌌 Céu Azul Escuro com Espirais Amarelas e Girassóis",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#0f172a"/>
+            <!-- Swirls -->
+            <path d="M 30,120 Q 90,40 160,80 T 270,60" fill="none" stroke="#facc15" stroke-width="8" stroke-linecap="round" stroke-dasharray="8 6"/>
+            <path d="M 20,80 Q 100,10 180,50 T 280,30" fill="none" stroke="#38bdf8" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="230" cy="40" r="18" fill="#fde047" opacity="0.9"/>
+            <circle cx="230" cy="40" r="28" fill="#fef08a" opacity="0.3"/>
+            <!-- Star dots -->
+            <circle cx="60" cy="40" r="6" fill="#facc15"/>
+            <circle cx="120" cy="70" r="8" fill="#fef08a"/>
+            <circle cx="170" cy="30" r="7" fill="#fef08a"/>
+          </svg>
+        `,
+        questions: [
+          "Se pudesses entrar neste quadro de noite, que barulhos achas que se ouviriam lá dentro?",
+          "Como achas que o céu se mexe nesta pintura? Parece calmo ou parece que está vento?",
+          "Esta cor amarela faz-te lembrar um dia quente de verão ou um dia frio?",
+          "Se o pintor usou tanta tinta com o pincel, como achas que ficava o quadro se lhe passássemos a mão devagarinho?"
+        ],
+        atelierMaterials: ["brush", "dots"],
+        suggestedColors: ["#0f172a", "#1d4ed8", "#38bdf8", "#facc15", "#f59e0b", "#ffffff"],
+        stamps: ["⭐", "🌙", "🌻", "🌀", "🌲"],
+        guideNote: "Van Gogh permite trabalhar a motricidade ampla com espirais no ar e a relação entre cores quentes (amarelos) e frias (azuis) na expressão emocional."
+      },
+
+      // 2. Piet Mondrian
+      {
+        id: "mondrian",
+        category: "artistas",
+        name: "Blocos Geométricos de Linhas Retas",
+        artistOrCulture: "Piet Mondrian",
+        focus: "Formas Geométricas & Cores Primárias",
+        intro: "Piet Mondrian adorava brincar com linhas retas pretas e três cores mágicas: o vermelho, o azul e o amarelo para construir quadros.",
+        icon: "fa-solid fa-shapes",
+        bgGradient: "from-red-500 via-amber-400 to-blue-600",
+        colorTheme: "#dc2626",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDscV6cVURN2MFXw3CPqKVN6PXnsD1ILGGtpOWKHjZ1Q&s=10",
+        visualHint: "🧱 Grelha Preta com Quadrados Vermelhos, Azuis e Amarelos",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#ffffff"/>
+            <!-- Mondrian Rectangles -->
+            <rect x="0" y="0" width="100" height="90" fill="#dc2626"/>
+            <rect x="220" y="70" width="80" height="90" fill="#2563eb"/>
+            <rect x="180" y="0" width="120" height="40" fill="#facc15"/>
+            <!-- Black Grid Lines -->
+            <line x1="100" y1="0" x2="100" y2="160" stroke="#000000" stroke-width="8"/>
+            <line x1="220" y1="0" x2="220" y2="160" stroke="#000000" stroke-width="8"/>
+            <line x1="0" y1="90" x2="300" y2="90" stroke="#000000" stroke-width="8"/>
+            <line x1="100" y1="40" x2="300" y2="40" stroke="#000000" stroke-width="6"/>
+          </svg>
+        `,
+        questions: [
+          "Quantas cores consegues descobrir aqui? Sabes o nome delas?",
+          "Estas linhas parecem estradas de uma cidade vista de cima? Onde andariam os carros?",
+          "Que formas geométricas estão escondidas nesta folha? Há círculos ou só linhas retas?",
+          "Se fosses construir uma casa com peças de madeira usando só estas cores, qual seria a primeira peça?"
+        ],
+        atelierMaterials: ["brush", "stamps"],
+        suggestedColors: ["#dc2626", "#2563eb", "#facc15", "#000000", "#ffffff", "#94a3b8"],
+        stamps: ["🟥", "🟦", "🟨", "⬛", "🚗", "🏠"],
+        guideNote: "Excelente para a identificação de cores primárias, orientação espacial (cima/baixo, esquerda/direita) e noção de contorno e limites retos."
+      },
+
+      // 3. Henri Matisse
+      {
+        id: "matisse",
+        category: "artistas",
+        name: "Tesoura de Papéis Dançantes",
+        artistOrCulture: "Henri Matisse",
+        focus: "Recortes, Colagens & Movimento",
+        intro: "Henri Matisse adorava 'desenhar com a tesoura'! Em vez de usar pincéis, recortava papéis de muitas cores com formas que pareciam dançar.",
+        icon: "fa-solid fa-scissors",
+        bgGradient: "from-emerald-500 via-teal-400 to-indigo-600",
+        colorTheme: "#059669",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRigO3QKQzWDvb2-f3tUI-PKPtYs3_mJ6afQ08M7R4KIXAqf9ivbI81NYI&s",
+        visualHint: "✂️ Formas Orgânicas Coloridas que parecem dançar",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#fef3c7"/>
+            <!-- Organic cutouts -->
+            <path d="M 40,80 C 30,30 80,40 90,70 C 110,60 120,90 90,110 C 60,130 50,110 40,80 Z" fill="#059669"/>
+            <path d="M 180,40 C 210,20 230,50 210,70 C 240,90 220,120 190,110 C 160,100 170,60 180,40 Z" fill="#ec4899"/>
+            <path d="M 120,100 C 130,120 150,130 160,115 C 170,100 150,90 135,95 Z" fill="#3b82f6"/>
+            <!-- Coral shapes -->
+            <circle cx="250" cy="120" r="16" fill="#f97316"/>
+          </svg>
+        `,
+        questions: [
+          "O que achas que estas formas parecem: folhas, peixinhos a nadar ou monstros amigos?",
+          "Se estas formas dançassem pela sala, que tipo de música estaria a tocar?",
+          "Em vez de usar tintas, este artista usou tesoura e papéis coloridos. Se fecharmos os olhos, que recorte gostarias de inventar?"
+        ],
+        atelierMaterials: ["stamps", "brush"],
+        suggestedColors: ["#059669", "#ec4899", "#3b82f6", "#f97316", "#8b5cf6", "#fde047"],
+        stamps: ["🌿", "🐟", "💃", "🍃", "✂️", "⭐"],
+        guideNote: "Convida à exploração corporal do movimento (dançar como as formas de Matisse ao som de música clássica ou jazz) e motricidade fina do rasgar e recortar."
+      },
+
+      // 4. Yayoi Kusama
+      {
+        id: "kusama",
+        category: "artistas",
+        name: "Abóbora das Infinitas Bolinhas",
+        artistOrCulture: "Yayoi Kusama",
+        focus: "Padrões, Repetição & Bolinhas de Sabão",
+        intro: "Yayoi Kusama é uma artista que vê bolinhas por todo o lado e adora cobrir abóboras e salas inteiras com pintinhas divertidas e saltitantes.",
+        icon: "fa-solid fa-circle-dot",
+        bgGradient: "from-amber-400 via-yellow-500 to-neutral-900",
+        colorTheme: "#d97706",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgSVmmKsYIPHJbfIH0p1G74ed4kdgcocgC4jSD1ZtNuy2busOzCj_BNtc&s",
+        visualHint: "🟡 Abóbora Amarela Coberta de Bolinhas Pretas",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#fef08a"/>
+            <!-- Pumpkin outline -->
+            <ellipse cx="150" cy="100" rx="90" ry="50" fill="#f59e0b"/>
+            <ellipse cx="150" cy="100" rx="55" ry="52" fill="#d97706"/>
+            <ellipse cx="150" cy="100" rx="25" ry="54" fill="#b45309"/>
+            <path d="M 145,50 L 155,30 L 165,50 Z" fill="#15803d"/>
+            <!-- Polka dots -->
+            <circle cx="150" cy="70" r="7" fill="#000000"/>
+            <circle cx="150" cy="95" r="9" fill="#000000"/>
+            <circle cx="150" cy="120" r="7" fill="#000000"/>
+            <circle cx="120" cy="85" r="8" fill="#000000"/>
+            <circle cx="120" cy="110" r="6" fill="#000000"/>
+            <circle cx="180" cy="85" r="8" fill="#000000"/>
+            <circle cx="180" cy="110" r="6" fill="#000000"/>
+            <circle cx="90" cy="100" r="6" fill="#000000"/>
+            <circle cx="210" cy="100" r="6" fill="#000000"/>
+          </svg>
+        `,
+        questions: [
+          "O que aconteceria se a nossa sala de repente ficasse toda coberta de bolinhas amarelas e pretas?",
+          "Consegues contar dez bolinhas ou são tantas que parecem pipocas a saltar?",
+          "Se fosses um animal coberto de pintas como esta arte, que animal serias?"
+        ],
+        atelierMaterials: ["dots", "brush", "stamps"],
+        suggestedColors: ["#000000", "#facc15", "#ffffff", "#ef4444", "#3b82f6", "#10b981"],
+        stamps: ["🟡", "⚫", "🔴", "🎃", "🐞", "🐆"],
+        guideNote: "Estimula a contagem, a perceção de ritmo/padrão visual e a imaginação lúdica de transfiguração do espaço (sala dos espelhos)."
+      },
+
+      // 5. Joan Miró
+      {
+        id: "miro",
+        category: "artistas",
+        name: "Varinha das Criaturas Mágicas",
+        artistOrCulture: "Joan Miró",
+        focus: "Imaginação Pura, Linhas Livres & Olhos Curiosos",
+        intro: "Joan Miró brincava com a imaginação dos sonhos: desenhava linhas onduladas, olhos curiosos e estrelas misteriosas cheias de liberdade.",
+        icon: "fa-solid fa-wand-magic-sparkles",
+        bgGradient: "from-blue-500 via-amber-300 to-rose-500",
+        colorTheme: "#2563eb",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3Rwqj0wKwn_FJbhafcQgETC4vrXJJuJWeXCX-kvd5Og&s=10",
+        visualHint: "✨ Linhas onduladas pretas, olhos gigantes e estrelas solares",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#f8fafc"/>
+            <!-- Miró Free Lines -->
+            <path d="M 40,130 Q 90,20 150,60 T 260,110" fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="45" r="22" fill="#ef4444"/>
+            <circle cx="190" cy="90" r="16" fill="#3b82f6"/>
+            <!-- Big Miró eye -->
+            <ellipse cx="230" cy="50" rx="20" ry="12" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+            <circle cx="230" cy="50" r="6" fill="#000000"/>
+            <!-- Star asterisk -->
+            <path d="M 60,70 L 60,95 M 48,82 L 72,82 M 52,74 L 68,90 M 52,90 L 68,74" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        `,
+        questions: [
+          "Olha para esta personagem estranha: achas que é um pássaro, uma pessoa ou um ser de outro planeta?",
+          "O que achas que esta linha comprida e ondulada está a tentar apanhar?",
+          "Que nome darias a esta criatura mágica?"
+        ],
+        atelierMaterials: ["brush", "dots", "stamps"],
+        suggestedColors: ["#000000", "#ef4444", "#3b82f6", "#facc15", "#10b981", "#ffffff"],
+        stamps: ["👁️", "⭐", "🐦", "🛸", "🐾", "〰️"],
+        guideNote: "Incentiva a criação de seres fantásticos e a atribuição de narrativas verbais a grafismos livres."
+      },
+
+      // 6. Cultura Aborígene Australiana
+      {
+        id: "aboriginal",
+        category: "culturas",
+        name: "Pau de Pontos e Pegadas da Terra",
+        artistOrCulture: "Povos Indígenas da Austrália",
+        focus: "Pintura de Pontilhismo & Histórias da Natureza",
+        intro: "Na Austrália, um lugar muito distante de terra avermelhada onde saltam os cangurus, os povos indígenas contam histórias há milhares de anos pintando caminhos secretos e animais com pontinhos mágicos feitos com galhos e dedos.",
+        icon: "fa-solid fa-earth-oceania",
+        bgGradient: "from-amber-800 via-orange-700 to-yellow-600",
+        colorTheme: "#9a3412",
+        visualHint: "🦘 Caminhos de Pontos Ocre e Pegadas de Canguru",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#78350f"/>
+            <!-- Concentric dot circles -->
+            <circle cx="150" cy="80" r="14" fill="#fef3c7"/>
+            <circle cx="150" cy="80" r="28" fill="none" stroke="#f59e0b" stroke-width="6" stroke-dasharray="2 10" stroke-linecap="round"/>
+            <circle cx="150" cy="80" r="44" fill="none" stroke="#ea580c" stroke-width="6" stroke-dasharray="2 12" stroke-linecap="round"/>
+            <circle cx="150" cy="80" r="60" fill="none" stroke="#fef08a" stroke-width="6" stroke-dasharray="2 14" stroke-linecap="round"/>
+            <!-- Tracks -->
+            <path d="M 40,30 Q 80,60 110,80" fill="none" stroke="#fef3c7" stroke-width="4" stroke-dasharray="4 6"/>
+            <path d="M 260,130 Q 220,100 190,80" fill="none" stroke="#fef3c7" stroke-width="4" stroke-dasharray="4 6"/>
+          </svg>
+        `,
+        questions: [
+          "Sabias que estas pessoas contavam histórias no chão e em cascas de árvore usando pontinhos feitos com galhos? O que achas que este caminho de pontos está a seguir?",
+          "Se as tuas mãos fizessem pegadas de animais na terra, como seriam?",
+          "Que animal que vive na natureza gostarias de desenhar usando apenas pontinhas feitas com a ponta dos dedos?"
+        ],
+        atelierMaterials: ["dots", "brush"],
+        suggestedColors: ["#78350f", "#9a3412", "#c2410c", "#ea580c", "#f59e0b", "#fef3c7"],
+        stamps: ["🦘", "🦎", "🐍", "🐾", "👣", "🌿"],
+        guideNote: "Conexão direta com a terra, elementos naturais (galhos, dedos, pedras) e valorização do património dos povos originários."
+      },
+
+      // 7. Cultura Japonesa
+      {
+        id: "japan",
+        category: "culturas",
+        name: "Pássaro de Papel (Origami) e Flor de Cerejeira",
+        artistOrCulture: "Cultura do Japão",
+        focus: "Tradição, Delicadeza & Origami",
+        intro: "No Japão, do outro lado do mar, as pessoas descalçam os sapatos para manter as casas tranquilas e perfumadas, e adoram a arte do Origami — a magia de dobrar uma folha de papel até nascer um pássaro ou uma flor sem usar cola!",
+        icon: "fa-solid fa-fan",
+        bgGradient: "from-rose-400 via-pink-300 to-red-500",
+        colorTheme: "#e11d48",
+        visualHint: "🌸 Dobragens de papel e pétalas ao vento",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#fff1f2"/>
+            <!-- Japanese Fan / Sun / Origami bird shape -->
+            <circle cx="150" cy="80" r="45" fill="#f43f5e" opacity="0.15"/>
+            <!-- Geometric Crane silhouette -->
+            <polygon points="150,40 180,85 150,75 120,85" fill="#e11d48"/>
+            <polygon points="150,75 165,110 150,95 135,110" fill="#be123c"/>
+            <line x1="120" y1="85" x2="90" y2="70" stroke="#be123c" stroke-width="4"/>
+            <!-- Blossom petals -->
+            <circle cx="80" cy="50" r="8" fill="#fda4af"/>
+            <circle cx="220" cy="60" r="10" fill="#f43f5e"/>
+            <circle cx="240" cy="100" r="7" fill="#fda4af"/>
+            <circle cx="70" cy="110" r="9" fill="#fda4af"/>
+          </svg>
+        `,
+        questions: [
+          "Sabias que só com uma folha de papel quadrada, dobrando com muito cuidado, se pode fazer um sapo ou um pássaro? O que gostarias de transformar em papel?",
+          "Olha para este desenho de flores de cerejeira cor-de-rosa: a que cheira a primavera para ti?",
+          "No Japão tiram-se os sapatos antes de entrar em casa para manter tudo limpo e calmo. Como te sentes quando andas descalço ou de meias pela sala?"
+        ],
+        atelierMaterials: ["brush", "stamps"],
+        suggestedColors: ["#e11d48", "#f43f5e", "#fda4af", "#ffffff", "#0284c7", "#166534"],
+        stamps: ["🌸", "🦢", "🏮", "🎎", "🐸", "🎋"],
+        guideNote: "Trabalha a serenidade, o respeito pelo espaço comum (o ritual de descalçar) e a exploração sensorial dos cheiros e texturas do papel."
+      },
+
+      // 8. Culturas Africanas
+      {
+        id: "africa",
+        category: "culturas",
+        name: "Máscara de Madeira dos Guardiões",
+        artistOrCulture: "Culturas Africanas Tradicionais",
+        focus: "Expressividade, Máscaras & Padrões Rítmicos",
+        intro: "Em muitas aldeias tradicionais de África, as pessoas esculpem máscaras de madeira com riscas e formas geométricas. Elas são usadas em festas e danças com tambores para contar histórias sábias e proteger a comunidade.",
+        icon: "fa-solid fa-mask",
+        bgGradient: "from-amber-900 via-amber-700 to-yellow-500",
+        colorTheme: "#b45309",
+        visualHint: "🎭 Máscara Esculpida com Riscas e Geometrias",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#fef3c7"/>
+            <!-- African Mask shape -->
+            <path d="M 115,30 Q 150,20 185,30 L 175,130 Q 150,145 125,130 Z" fill="#78350f"/>
+            <!-- Slit Eyes -->
+            <ellipse cx="135" cy="65" rx="10" ry="4" fill="#fef08a"/>
+            <ellipse cx="165" cy="65" rx="10" ry="4" fill="#fef08a"/>
+            <!-- Nose & Mouth -->
+            <polygon points="150,65 145,95 155,95" fill="#f59e0b"/>
+            <rect x="142" y="105" width="16" height="6" fill="#fef08a" rx="2"/>
+            <!-- Geometric cheek stripes -->
+            <path d="M 120,80 L 132,86 M 120,92 L 132,98" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 180,80 L 168,86 M 180,92 L 168,98" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        `,
+        questions: [
+          "Se vestisses esta máscara, que poder mágico ou que história contarias aos teus amigos?",
+          "Achas que esta cara está feliz, zangada ou a guardar um grande segredo?",
+          "Estes padrões na madeira têm riscas e triângulos. Onde mais costumas ver riscas no teu dia a dia?"
+        ],
+        atelierMaterials: ["brush", "stamps", "dots"],
+        suggestedColors: ["#78350f", "#92400e", "#b45309", "#d97706", "#fef08a", "#ffffff"],
+        stamps: ["🦁", "🥁", "🎭", "☀️", "🦓", "🌾"],
+        guideNote: "Excelente para a dramatização e jogo simbólico (fazer a voz da máscara), além de explorar padrões simétricos faciais."
+      },
+
+      // 9. Cultura Mexicana
+      {
+        id: "mexico",
+        category: "culturas",
+        name: "Escultura Alebrije Fantástica",
+        artistOrCulture: "Cultura Tradicional do México",
+        focus: "Festividades, Cores Vivas & Bichos Mágicos",
+        intro: "No México, uma terra cheia de sol, música e celebrações com flores alegres, os artistas criam 'Alebrijes' — criaturas mágicas inventadas que misturam partes de vários animais, com asas brilhantes e todas as cores do arco-íris!",
+        icon: "fa-solid fa-dragon",
+        bgGradient: "from-pink-500 via-purple-600 to-yellow-400",
+        colorTheme: "#c026d3",
+        visualHint: "🎨 Criatura com Asas de Dragão, Cauda de Raposa e Cores Elétricas",
+        visualSvg: `
+          <svg class="w-full h-full" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="160" fill="#fdf4ff"/>
+            <!-- Fantastic mythical creature -->
+            <ellipse cx="140" cy="95" rx="45" ry="30" fill="#a855f7"/>
+            <circle cx="100" cy="75" r="22" fill="#ec4899"/>
+            <!-- Wings -->
+            <path d="M 140,75 C 160,30 200,30 210,60 C 180,65 160,75 140,75 Z" fill="#eab308"/>
+            <!-- Fluffy tail -->
+            <path d="M 180,95 Q 225,90 230,120 Q 200,125 175,105 Z" fill="#06b6d4"/>
+            <!-- Eye & spots -->
+            <circle cx="95" cy="72" r="5" fill="#fef08a"/>
+            <circle cx="95" cy="72" r="2" fill="#000000"/>
+            <circle cx="130" cy="95" r="4" fill="#fef08a"/>
+            <circle cx="150" cy="105" r="5" fill="#ec4899"/>
+          </svg>
+        `,
+        questions: [
+          "Esta criatura tem asas de dragão e corpo de gato! Se pudesses misturar dois animais teus favoritos, que bicho nascia?",
+          "Que cores tão alegres e vivas! Se esta imagem fosse uma festa, o que haveria para comer ou beber?"
+        ],
+        atelierMaterials: ["brush", "dots", "stamps"],
+        suggestedColors: ["#ec4899", "#a855f7", "#06b6d4", "#eab308", "#22c55e", "#ffffff"],
+        stamps: ["🐉", "🐱", "🌮", "🎉", "🌈", "🦋"],
+        guideNote: "Desperta o hibridismo criativo (inventar animais impossíveis), valoriza a alegria das cores e permite falar sobre celebrações comunitárias."
+      }
+    ];
+
+    // State Variables
+    let isSuitcaseOpen = false;
+    let activeFilter = 'artistas';
+    let currentTreasure = null;
+    let activeQuestionIndex = 0;
+    let hasPlayedWelcomeSpeech = false;
+
+    // Drawing Canvas State
+    let canvas, ctx;
+    let isDrawing = false;
+    let currentTool = 'brush'; // 'brush', 'dots', 'stamps', 'eraser'
+    let currentColor = '#0f172a';
+    let currentBrushSize = 16;
+    let selectedStamp = '⭐';
+    let canvasHistory = [];
+    const MAX_HISTORY = 10;
+
+    // Audio Voice Recording State
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioBlob = null;
+    let isRecording = false;
+    let recordingInterval = null;
+    let recordingSeconds = 0;
+  </script>
+
+  <script>
+    // Initialize the app on window load
+    window.addEventListener('load', () => {
+      initCanvas();
+      renderSuitcaseItems();
+      renderEducatorsGuideAccordion();
+      renderColorSwatches();
+      
+      // Auto-trigger welcome speech on first user gesture (compliant with browser autoplay policies)
+      const triggerWelcomeOnFirstTouch = () => {
+        if (!hasPlayedWelcomeSpeech) {
+          playWelcomeVoiceGuide(false);
+        }
+        window.removeEventListener('click', triggerWelcomeOnFirstTouch);
+        window.removeEventListener('touchstart', triggerWelcomeOnFirstTouch);
+      };
+      window.addEventListener('click', triggerWelcomeOnFirstTouch, { once: true });
+      window.addEventListener('touchstart', triggerWelcomeOnFirstTouch, { once: true });
+
+      // If synthesis is immediately permissible, attempt smooth play after short delay
+      setTimeout(() => {
+        if (!hasPlayedWelcomeSpeech) {
+          playWelcomeVoiceGuide(false);
+        }
+      }, 700);
+    });
+
+    // Voice welcome introduction specially adapted for preschool children (3 to 6 years)
+    function playWelcomeVoiceGuide(forcedByUser = false) {
+      if (!soundEnabled && !forcedByUser) return;
+      if (!('speechSynthesis' in window)) return;
+      if (hasPlayedWelcomeSpeech && !forcedByUser) return;
+
+      const welcomeSpeechText = "Olá, amiguinho! Bem-vindo à Mala Mágica! Aqui dentro estão guardados tesouros, tintas e segredos de pintores e de terras muito distantes. Toca na mala para a abrir, escolhe um tesouro, responde às perguntas com a tua voz e faz desenhos cheios de cor! Vamos começar?";
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(welcomeSpeechText);
+      utterance.lang = 'pt-PT';
+      utterance.pitch = 1.2; // Cheerful, friendly and warm pitch for kids
+      utterance.rate = 0.88; // Slightly slower, well-enunciated speech
+
+      const btn = document.getElementById('btnPlayWelcomeVoice');
+      const btnText = document.getElementById('welcomeVoiceBtnText');
+
+      if (btn && btnText) {
+        btnText.innerText = "🔊 A ouvir a explicação...";
+        btn.classList.add('ring-4', 'ring-amber-300');
+      }
+
+      utterance.onstart = () => {
+        hasPlayedWelcomeSpeech = true;
+      };
+
+      utterance.onend = () => {
+        if (btn && btnText) {
+          btnText.innerText = "🔊 Ouvir novamente a explicação!";
+          btn.classList.remove('ring-4', 'ring-amber-300');
+        }
+      };
+
+      utterance.onerror = () => {
+        if (btn && btnText) {
+          btnText.innerText = "🔊 Ouvir o que vamos fazer!";
+          btn.classList.remove('ring-4', 'ring-amber-300');
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Suitcase Open / Close Toggle with Sound FX
+    function toggleSuitcase(open) {
+      isSuitcaseOpen = open;
+      const closedOverlay = document.getElementById('closedSuitcaseOverlay');
+      const openContent = document.getElementById('openSuitcaseContent');
+      const shell = document.getElementById('suitcaseShell');
+
+      if (open) {
+        playCheerChime();
+        closedOverlay.classList.add('hidden');
+        openContent.classList.remove('hidden');
+        shell.classList.remove('p-16');
+        shell.classList.add('p-5');
+      } else {
+        playNote("E4", "8n");
+        openContent.classList.add('hidden');
+        closedOverlay.classList.remove('hidden');
+      }
+    }
+
+    // Filter Items between Artistas and Culturas
+    function filterItems(filterType) {
+      activeFilter = filterType;
+      playNote("C5", "16n");
+
+      const tabArt = document.getElementById('tabArtistas');
+      const tabCult = document.getElementById('tabCulturas');
+
+      if (filterType === 'artistas') {
+        tabArt.className = "px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all shadow-kid border-2 bg-amber-400 text-amber-950 border-amber-300 scale-105";
+        tabCult.className = "px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all border-2 bg-amber-900/60 text-amber-100 hover:bg-amber-900 border-amber-700";
+      } else {
+        tabCult.className = "px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all shadow-kid border-2 bg-amber-400 text-amber-950 border-amber-300 scale-105";
+        tabArt.className = "px-5 py-2.5 rounded-2xl font-fun font-bold text-base sm:text-lg transition-all border-2 bg-amber-900/60 text-amber-100 hover:bg-amber-900 border-amber-700";
+      }
+
+      renderSuitcaseItems();
+    }
+
+    // Render items inside the suitcase
+    function renderSuitcaseItems() {
+      const grid = document.getElementById('itemsGrid');
+      const filtered = suitcaseTreasures.filter(item => item.category === activeFilter);
+      grid.innerHTML = '';
+
+      filtered.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-white/95 rounded-2xl p-3 flex flex-col items-center justify-between text-center cursor-pointer shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-amber-300 group";
+        card.onclick = () => openTreasureDetail(item.id);
+
+        const visualThumbnail = item.image 
+          ? `<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shadow-sm group-hover:rotate-3 transition-transform border border-amber-300 bg-white flex items-center justify-center relative">
+               <img src="${item.image}" alt="${item.artistOrCulture}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div style="display:none;" class="w-full h-full bg-gradient-to-tr ${item.bgGradient} items-center justify-center text-white text-2xl sm:text-3xl">
+                 <i class="${item.icon}"></i>
+               </div>
+             </div>`
+          : `<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr ${item.bgGradient} flex items-center justify-center text-white text-2xl sm:text-3xl shadow-sm group-hover:rotate-6 transition-transform">
+               <i class="${item.icon}"></i>
+             </div>`;
+
+        card.innerHTML = `
+          ${visualThumbnail}
+          <div class="mt-2 w-full">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block line-clamp-1">${item.artistOrCulture}</span>
+            <h4 class="text-xs sm:text-sm font-bold font-fun text-slate-800 line-clamp-2 leading-tight">${item.name}</h4>
+          </div>
+          <div class="mt-2 w-full pt-1.5 border-t border-slate-100 flex items-center justify-center gap-1 text-[11px] font-bold text-amber-600">
+            <i class="fa-solid fa-sparkles text-[10px]"></i>
+            <span>Explorar</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Navigation: Open Treasure Detail Screen
+    function openTreasureDetail(treasureId) {
+      const found = suitcaseTreasures.find(t => t.id === treasureId);
+      if (!found) return;
+
+      currentTreasure = found;
+      activeQuestionIndex = 0;
+      playNote("A5", "8n");
+
+      // Switch screens
+      document.getElementById('viewSuitcase').classList.add('hidden');
+      document.getElementById('viewDetail').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Populate Object Card Details
+      document.getElementById('detailCategoryBadge').innerText = currentTreasure.category === 'artistas' ? '🎨 Artista Plástico' : '🌍 Cultura Tradicional';
+      document.getElementById('detailCategoryBadge').style.backgroundColor = currentTreasure.colorTheme;
+      document.getElementById('detailFocusBadge').innerText = currentTreasure.focus;
+      
+      document.getElementById('detailObjectName').innerText = currentTreasure.name;
+      document.getElementById('detailTitle').innerText = currentTreasure.artistOrCulture;
+      document.getElementById('detailSubtitle').innerText = currentTreasure.visualHint;
+
+      // Icon wrap
+      const iconWrap = document.getElementById('detailObjectIconWrap');
+      iconWrap.className = `w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-inner border-2 border-slate-100 bg-gradient-to-tr ${currentTreasure.bgGradient} text-white`;
+      iconWrap.innerHTML = `<i class="${currentTreasure.icon}"></i>`;
+
+      // Visual preview: prioritize real image if available, with SVG fallback
+      const previewContainer = document.getElementById('artworkVisualPreview');
+      if (currentTreasure.image) {
+        previewContainer.className = "w-full h-40 sm:h-48 rounded-2xl mb-4 p-1.5 relative flex items-center justify-center text-center overflow-hidden border-2 border-slate-200 bg-slate-900";
+        previewContainer.innerHTML = `
+          <img src="${currentTreasure.image}" alt="${currentTreasure.artistOrCulture}" class="max-h-full max-w-full rounded-xl object-contain shadow-md transition-transform duration-300 hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div style="display:none;" class="w-full h-full items-center justify-center">${currentTreasure.visualSvg}</div>
+        `;
+      } else {
+        previewContainer.className = "w-full h-36 sm:h-44 rounded-2xl mb-4 p-3 relative flex items-center justify-center text-center overflow-hidden border-2 border-slate-100";
+        previewContainer.innerHTML = currentTreasure.visualSvg;
+      }
+
+      // Update intro text and title
+      const introBox = document.getElementById('detailIntroBox');
+      const introText = document.getElementById('detailIntroText');
+      const introTitle = document.getElementById('detailIntroTitle');
+      const introIcon = document.getElementById('detailIntroIcon');
+      if (currentTreasure.intro) {
+        introBox.classList.remove('hidden');
+        introTitle.innerText = currentTreasure.category === 'culturas' ? `🌍 De onde vem esta tradição?` : `🎨 Quem é este artista?`;
+        introIcon.className = currentTreasure.category === 'culturas' ? `fa-solid fa-earth-americas` : `fa-solid fa-palette`;
+        introText.innerText = currentTreasure.intro;
+      } else {
+        introBox.classList.add('hidden');
+      }
+
+      // Reset Audio Recording UI
+      resetRecordingUI();
+
+      // Render Questions
+      updateQuestionCard();
+
+      // Setup Stamps for this treasure
+      setupStampsForCurrentTreasure();
+
+      // Recommend color theme
+      if (currentTreasure.suggestedColors && currentTreasure.suggestedColors.length > 0) {
+        setColor(currentTreasure.suggestedColors[0]);
+      }
+    }
+
+    function goToHome() {
+      playNote("D5", "16n");
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      stopVoiceRecording();
+
+      document.getElementById('viewDetail').classList.add('hidden');
+      document.getElementById('viewSuitcase').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+  <script>
+    // Update Question Card Text & Navigation Dots
+    function updateQuestionCard() {
+      if (!currentTreasure) return;
+      const qText = currentTreasure.questions[activeQuestionIndex];
+      const p = document.getElementById('activeQuestionText');
+      p.innerText = `«${qText}»`;
+
+      // Indicators dots
+      const dotsContainer = document.getElementById('questionIndicators');
+      dotsContainer.innerHTML = '';
+      currentTreasure.questions.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `w-3 h-3 rounded-full transition-all ${idx === activeQuestionIndex ? 'bg-amber-600 scale-125' : 'bg-amber-200'}`;
+        dot.onclick = () => {
+          activeQuestionIndex = idx;
+          updateQuestionCard();
+          playNote("E5", "16n");
+        };
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function changeQuestion(delta) {
+      if (!currentTreasure) return;
+      activeQuestionIndex += delta;
+      if (activeQuestionIndex < 0) activeQuestionIndex = currentTreasure.questions.length - 1;
+      if (activeQuestionIndex >= currentTreasure.questions.length) activeQuestionIndex = 0;
+      playNote("F5", "16n");
+      updateQuestionCard();
+    }
+
+    // Read Active Question Aloud with Web Speech Synthesis (Child-friendly voice)
+    function readActiveQuestionAloud() {
+      if (!soundEnabled) {
+        showToast("Ativa o som no topo da página primeiro!");
+        return;
+      }
+      if (!currentTreasure) return;
+      
+      if (!('speechSynthesis' in window)) {
+        showToast("O teu navegador não suporta leitura de voz.");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const textToRead = currentTreasure.questions[activeQuestionIndex];
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utterance.lang = 'pt-PT';
+      utterance.pitch = 1.15; // Slightly higher pitch for playful, gentle delivery
+      utterance.rate = 0.9;   // Clear, slightly slower for kindergarten kids
+
+      const readBtn = document.getElementById('btnReadAloud');
+      readBtn.classList.add('bg-amber-500', 'ring-2', 'ring-amber-400');
+
+      utterance.onend = () => {
+        readBtn.classList.remove('bg-amber-500', 'ring-2', 'ring-amber-400');
+      };
+
+      utterance.onerror = () => {
+        readBtn.classList.remove('bg-amber-500', 'ring-2', 'ring-amber-400');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Read Intro Aloud with Web Speech Synthesis (Child-friendly voice)
+    function readIntroAloud() {
+      if (!soundEnabled) {
+        showToast("Ativa o som no topo da página primeiro!");
+        return;
+      }
+      if (!currentTreasure || !currentTreasure.intro) return;
+      
+      if (!('speechSynthesis' in window)) {
+        showToast("O teu navegador não suporta leitura de voz.");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(currentTreasure.intro);
+      utterance.lang = 'pt-PT';
+      utterance.pitch = 1.15;
+      utterance.rate = 0.9;
+
+      const readBtn = document.getElementById('btnReadIntro');
+      readBtn.classList.add('bg-amber-400', 'ring-2', 'ring-amber-400');
+
+      utterance.onend = () => {
+        readBtn.classList.remove('bg-amber-400', 'ring-2', 'ring-amber-400');
+      };
+
+      utterance.onerror = () => {
+        readBtn.classList.remove('bg-amber-400', 'ring-2', 'ring-amber-400');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* VOICE RECORDER (Using MediaRecorder API) */
+    async function toggleVoiceRecording() {
+      if (isRecording) {
+        stopVoiceRecording();
+      } else {
+        await startVoiceRecording();
+      }
+    }
+
+    async function startVoiceRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioEl = document.getElementById('audioPlayback');
+          audioEl.src = audioUrl;
+
+          // Enable playback button
+          const playBtn = document.getElementById('btnPlayRecording');
+          playBtn.disabled = false;
+          playBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+          playBtn.classList.add('bg-emerald-500', 'text-white', 'hover:bg-emerald-600', 'shadow-kid');
+
+          document.getElementById('recordingFeedback').innerHTML = `
+            <span class="text-emerald-700 font-bold">✨ Voz gravada com sucesso! Clica em "Ouvir" para escutar.</span>
+          `;
+          playNote("G5", "8n");
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        recordingSeconds = 0;
+
+        // UI updates
+        document.getElementById('btnRecordToggle').classList.remove('bg-rose-500', 'hover:bg-rose-600');
+        document.getElementById('btnRecordToggle').classList.add('bg-slate-800', 'hover:bg-slate-900', 'animate-pulse');
+        document.getElementById('recordBtnText').innerText = "Parar Gravação";
+        document.getElementById('recordBtnIcon').className = "fa-solid fa-square text-rose-500";
+        document.getElementById('recordingTimer').classList.remove('hidden');
+        document.getElementById('recordingFeedback').innerText = "Estamos a ouvir a tua história mágica... Fala!";
+
+        recordingInterval = setInterval(() => {
+          recordingSeconds++;
+          const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+          const secs = String(recordingSeconds % 60).padStart(2, '0');
+          document.getElementById('recordingTimer').innerText = `${mins}:${secs}`;
+          if (recordingSeconds >= 90) stopVoiceRecording(); // Cap recording at 1.5 mins
+        }, 1000);
+
+      } catch (err) {
+        showToast("Não foi possível aceder ao microfone. Verifica as permissões.");
+        console.warn("Microphone access error:", err);
+      }
+    }
+
+    function stopVoiceRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      }
+      isRecording = false;
+      clearInterval(recordingInterval);
+
+      // Reset button
+      const recordBtn = document.getElementById('btnRecordToggle');
+      if (recordBtn) {
+        recordBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900', 'animate-pulse');
+        recordBtn.classList.add('bg-rose-500', 'hover:bg-rose-600');
+        document.getElementById('recordBtnText').innerText = "Gravar Novamente";
+        document.getElementById('recordBtnIcon').className = "fa-solid fa-circle text-sm";
+      }
+    }
+
+    function playCurrentRecording() {
+      const audioEl = document.getElementById('audioPlayback');
+      if (!audioEl.src) return;
+      playNote("C5", "16n");
+      audioEl.play();
+      const playIcon = document.getElementById('playBtnIcon');
+      playIcon.className = "fa-solid fa-volume-high animate-bounce";
+      audioEl.onended = () => {
+        playIcon.className = "fa-solid fa-play";
+      };
+    }
+
+    function resetRecordingUI() {
+      stopVoiceRecording();
+      audioBlob = null;
+      document.getElementById('audioPlayback').src = '';
+      document.getElementById('btnRecordToggle').className = "px-6 py-3.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-fun font-bold text-base sm:text-lg shadow-kid active:translate-y-1 active:shadow-kid-active flex items-center gap-3 transition";
+      document.getElementById('recordBtnText').innerText = "Gravar Voz";
+      document.getElementById('recordBtnIcon').className = "fa-solid fa-circle text-sm";
+      document.getElementById('recordingTimer').classList.add('hidden');
+      document.getElementById('recordingTimer').innerText = "00:00";
+      
+      const playBtn = document.getElementById('btnPlayRecording');
+      playBtn.disabled = true;
+      playBtn.className = "px-5 py-3.5 rounded-2xl bg-slate-200 text-slate-400 font-fun font-bold text-base flex items-center gap-2 cursor-not-allowed transition";
+
+      document.getElementById('recordingFeedback').innerText = "Toca no botão vermelho e diz o que pensas em voz alta!";
+    }
+  </script>
+
+  <script>
+    const preschoolPalette = [
+      '#0f172a', // Preto/Escuro
+      '#ef4444', // Vermelho vivo
+      '#f97316', // Laranja
+      '#facc15', // Amarelo sol
+      '#22c55e', // Verde relva
+      '#06b6d4', // Turquesa
+      '#3b82f6', // Azul céu
+      '#a855f7', // Roxo mágico
+      '#ec4899', // Rosa chiclete
+      '#78350f', // Terra/Castanho ocre
+      '#ffffff'  // Branco
+    ];
+
+    function initCanvas() {
+      canvas = document.getElementById('drawingCanvas');
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Event listeners for Pointer / Touch / Mouse
+      canvas.addEventListener('pointerdown', startDrawing);
+      canvas.addEventListener('pointermove', draw);
+      canvas.addEventListener('pointerup', stopDrawing);
+      canvas.addEventListener('pointerleave', stopDrawing);
+
+      // Save initial blank state
+      saveCanvasHistory();
+    }
+
+    function resizeCanvas() {
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      // Save content before resize
+      const tempImg = ctx ? canvas.toDataURL() : null;
+
+      // Retina / High DPI resolution scaling
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      // Fill canvas background white
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      // Restore image if existed
+      if (tempImg) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, rect.width, rect.height);
+        };
+        img.src = tempImg;
+      }
+    }
+
+    function getCanvasCoordinates(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function startDrawing(e) {
+      e.preventDefault();
+      isDrawing = true;
+      document.getElementById('canvasEmptyHelp').classList.add('hidden');
+
+      const pos = getCanvasCoordinates(e);
+
+      if (currentTool === 'stamps') {
+        placeStamp(pos.x, pos.y);
+        saveCanvasHistory();
+        return;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+
+      if (currentTool === 'dots') {
+        // Dot painting stamp on tap
+        drawSingleDot(pos.x, pos.y);
+      } else {
+        // Draw start dot for brush or eraser
+        drawSingleDot(pos.x, pos.y);
+      }
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const pos = getCanvasCoordinates(e);
+
+      if (currentTool === 'brush') {
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = currentBrushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      } else if (currentTool === 'eraser') {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = currentBrushSize * 1.8;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      } else if (currentTool === 'dots') {
+        // Aboriginal dot trail
+        drawSingleDot(pos.x, pos.y);
+      }
+    }
+
+    function drawSingleDot(x, y) {
+      ctx.save();
+      ctx.fillStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+      ctx.beginPath();
+      ctx.arc(x, y, currentBrushSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function placeStamp(x, y) {
+      playNote("C6", "16n");
+      ctx.save();
+      ctx.font = `${currentBrushSize * 2.5}px Fredoka, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(selectedStamp, x, y);
+      ctx.restore();
+    }
+
+    function stopDrawing(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      ctx.closePath();
+      saveCanvasHistory();
+    }
+
+    function saveCanvasHistory() {
+      if (!canvas) return;
+      if (canvasHistory.length >= MAX_HISTORY) {
+        canvasHistory.shift();
+      }
+      canvasHistory.push(canvas.toDataURL());
+    }
+
+    function undoCanvas() {
+      if (canvasHistory.length <= 1) return;
+      playNote("B4", "16n");
+      canvasHistory.pop(); // Remove current
+      const previousState = canvasHistory[canvasHistory.length - 1];
+      const img = new Image();
+      img.onload = () => {
+        const rect = canvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      };
+      img.src = previousState;
+    }
+
+    function clearCanvasModal() {
+      document.getElementById('clearCanvasModalBox').classList.remove('hidden');
+    }
+
+    function closeClearModal() {
+      document.getElementById('clearCanvasModalBox').classList.add('hidden');
+    }
+
+    function confirmClearCanvas() {
+      closeClearModal();
+      playNote("D4", "8n");
+      const rect = canvas.getBoundingClientRect();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      document.getElementById('canvasEmptyHelp').classList.remove('hidden');
+      canvasHistory = [];
+      saveCanvasHistory();
+    }
+
+    // Tools setup
+    function setTool(toolName) {
+      currentTool = toolName;
+      playNote("G4", "16n");
+
+      // Update button styling
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-400', 'text-amber-950', 'shadow-sm');
+        btn.classList.add('bg-slate-100', 'text-slate-700');
+      });
+
+      const activeBtn = document.getElementById(`tool-${toolName}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-amber-400', 'text-amber-950', 'shadow-sm');
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+      }
+
+      // Stamps toggle
+      const stampsPal = document.getElementById('stampsPalette');
+      if (toolName === 'stamps') {
+        stampsPal.classList.remove('hidden');
+      } else {
+        stampsPal.classList.add('hidden');
+      }
+    }
+
+    function updateBrushSize(val) {
+      currentBrushSize = parseInt(val, 10);
+      const indicator = document.getElementById('brushSizeIndicator');
+      indicator.style.width = `${Math.max(8, Math.min(26, currentBrushSize))}px`;
+      indicator.style.height = `${Math.max(8, Math.min(26, currentBrushSize))}px`;
+      indicator.style.backgroundColor = currentColor;
+    }
+
+    function renderColorSwatches() {
+      const container = document.getElementById('colorSwatches');
+      container.innerHTML = '';
+      preschoolPalette.forEach((col, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-sm transition hover:scale-110 active:scale-95 flex items-center justify-center ${col === currentColor ? 'ring-2 ring-slate-800 scale-105' : ''}`;
+        dot.style.backgroundColor = col;
+        dot.onclick = () => setColor(col);
+        container.appendChild(dot);
+      });
+      updateBrushSize(currentBrushSize);
+    }
+
+    function setColor(hex) {
+      currentColor = hex;
+      playNote("C5", "16n");
+      renderColorSwatches();
+    }
+
+    function setupStampsForCurrentTreasure() {
+      const container = document.getElementById('stampsContainer');
+      container.innerHTML = '';
+      const list = currentTreasure && currentTreasure.stamps ? currentTreasure.stamps : ["⭐", "☀️", "🎨", "❤️", "🌿", "🐾"];
+      
+      selectedStamp = list[0];
+      list.forEach((st, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `w-9 h-9 text-lg rounded-xl flex items-center justify-center transition border ${st === selectedStamp ? 'bg-amber-300 border-amber-500 scale-110 shadow-sm' : 'bg-white border-slate-200'}`;
+        btn.innerText = st;
+        btn.onclick = () => {
+          selectedStamp = st;
+          playNote("E5", "16n");
+          setupStampsForCurrentTreasure();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // Download / Save Kid's Artwork
+    function downloadArtwork() {
+      playCheerChime();
+      const link = document.createElement('a');
+      const filename = `arte-${currentTreasure ? currentTreasure.id : 'crianca'}-${Date.now()}.png`;
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast("✨ Desenho descarregado com sucesso!");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  </script>
+
+  <script>
+    function openEducatorsGuide() {
+      playNote("G5", "8n");
+      const modal = document.getElementById('modalEducatorsGuide');
+      modal.classList.remove('hidden');
+    }
+
+    function closeEducatorsGuide() {
+      const modal = document.getElementById('modalEducatorsGuide');
+      modal.classList.add('hidden');
+    }
+
+    function renderEducatorsGuideAccordion() {
+      const container = document.getElementById('guideAccordionItems');
+      container.innerHTML = '';
+
+      suitcaseTreasures.forEach((item) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = "bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs";
+
+        wrapper.innerHTML = `
+          <button onclick="toggleAccordion('guide-${item.id}')" class="w-full text-left p-3.5 bg-slate-50 hover:bg-slate-100 flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-xl bg-gradient-to-tr ${item.bgGradient} text-white flex items-center justify-center text-sm shadow-xs">
+                <i class="${item.icon}"></i>
+              </span>
+              <div>
+                <span class="text-xs font-bold font-fun text-slate-800">${item.artistOrCulture}</span>
+                <span class="text-[11px] text-slate-500 block">${item.name}</span>
+              </div>
+            </div>
+            <i id="icon-guide-${item.id}" class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+          </button>
+          
+          <div id="guide-${item.id}" class="hidden p-4 text-xs text-slate-600 bg-white border-t border-slate-100 space-y-2">
+            <p><strong class="text-slate-800">Objetivo Pedagógico:</strong> ${item.focus}</p>
+            <p><strong class="text-slate-800">Mediação Sugerida:</strong> ${item.guideNote}</p>
+            <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 mt-2">
+              <span class="font-bold text-amber-900 block mb-1">Questões integradas para diálogo:</span>
+              <ul class="list-disc list-inside space-y-1 text-amber-950">
+                ${item.questions.map(q => `<li>«${q}»</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+        container.appendChild(wrapper);
+      });
+    }
+
+    function toggleAccordion(id) {
+      const content = document.getElementById(id);
+      const icon = document.getElementById(`icon-${id}`);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.className = "fa-solid fa-chevron-up text-xs text-purple-600";
+      } else {
+        content.classList.add('hidden');
+        icon.className = "fa-solid fa-chevron-down text-xs text-slate-400";
+      }
+    }
+  </script>
+</body>
+</html>
